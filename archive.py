@@ -24,7 +24,7 @@ class DatabaseArchive:
         else:
             print("Aucune archive")
 
-def main():
+def menuarchive():
     db = DatabaseArchive()
     while True:
         print("\n" + "="*60)
@@ -43,5 +43,5 @@ def main():
             print("Choix invalide")
     db.conn.close()
 
-if __name__ == "__main__":
+if __name__ == "__menuarchive__":
     main()
