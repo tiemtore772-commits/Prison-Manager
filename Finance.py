@@ -117,7 +117,7 @@ def inmate_summary(data):
 def finances_menu(data):
 
     while True:
-        print("\n╔═══ FINANCES ═══╗")
+        print("\n FINANCES ")
         print("  1. Register a bail/fine")
         print("  2. View overall summary")
         print("  3. Summary by inmate")
