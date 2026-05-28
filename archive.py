@@ -44,4 +44,4 @@ def menuarchive():
     db.conn.close()
 
 if __name__ == "__menuarchive__":
-    main()
+    menuarchive()
