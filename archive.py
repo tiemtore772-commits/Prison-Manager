@@ -1,41 +1,47 @@
-import json
-import os
+import sqlite3
 
-ARCHIVE_FILE = "archives.json"
+class DatabaseArchive:
+    def __init__(self, db_name="prison.db"):
+        self.conn = sqlite3.connect(db_name)
+        self.cursor = self.conn.cursor()
 
+    def show_archives_menu(self):
+        self.cursor.execute("""
+            SELECT archive_id, prisoner_id, name, entry_date, release_date, sentence_duration
+            FROM archives
+            ORDER BY release_date DESC
+        """)
+        rows = self.cursor.fetchall()
 
-class ArchiveManager:
-        def __init__(self):
-            if not os.path.exists(ARCHIVE_FILE):
-                with open(ARCHIVE_FILE, "w") as f:
-                    json.dump([], f)
+        print("\n" + "="*60)
+        print(" MENU ARCHIVES - DETENUS LIBERES")
+        print("="*60)
+        print(f"{'ID':<5} {'Nom':<20} {'Entrée':<12} {'Sortie':<12} {'Peine':<6}")
+        print("-" * 60)
+        if rows:
+            for row in rows:
+                print(f"{row[0]:<5} {row[2]:<20} {row[3]:<12} {row[4]:<12} {row[5]:<6}")
+        else:
+            print("Aucune archive")
 
-        def archive_prisoner(self, prisoner_data):
-            with open(ARCHIVE_FILE, "r") as f:
-                archives = json.load(f)
+def main():
+    db = DatabaseArchive()
+    while True:
+        print("\n" + "="*60)
+        print(" MENU ARCHIVES")
+        print("="*60)
+        print("1. Afficher archives")
+        print("2. Quitter")
+        choix = input("Votre choix: ")
 
-            archives.append(prisoner_data)
+        if choix == "1":
+            db.show_archives_menu()
+            input("\nAppuyez sur Entrée pour revenir...")
+        elif choix == "2":
+            break
+        else:
+            print("Choix invalide")
+    db.conn.close()
 
-            with open(ARCHIVE_FILE, "w") as f:
-                json.dump(archives, f, indent=4)
-
-            print("✅ Prisonnier archivé avec succès.")
-
-        def show_archives(self):
-            with open(ARCHIVE_FILE, "r") as f:
-                archives = json.load(f)
-
-            if not archives:
-                print("Aucune archive disponible.")
-                return
-
-            print("\n===== ARCHIVES =====")
-            for prisoner in archives:
-                print(f"""
-ID : {prisoner.get('id')}
-Nom : {prisoner.get('name')}
-Crime : {prisoner.get('crime')}
-Peine : {prisoner.get('sentence')} ans
--------------------------
-""")
-                
+if __name__ == "__main__":
+    main()
