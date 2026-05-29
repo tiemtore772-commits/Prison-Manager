@@ -138,4 +138,4 @@ def finances_menu(data):
         elif choice == "0":
             break
 
-    return data
+return data
