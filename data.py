@@ -43,7 +43,7 @@ class DatabaseData:
         else:
             print("Aucune cellule")
 
-def menudata():
+def menu_data():
     db = DatabaseData()
     while True:
         print("\n" + "="*60)
@@ -63,4 +63,4 @@ def menudata():
     db.conn.close()
 
 if __name__ == "__main__":
-    menudata()
+    menu_data()
