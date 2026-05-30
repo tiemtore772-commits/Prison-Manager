@@ -1,66 +1,49 @@
 import sqlite3
+from detainees import inmates
 
 class DatabaseData:
     def __init__(self, db_name="prison.db"):
         self.conn = sqlite3.connect(db_name)
         self.cursor = self.conn.cursor()
 
+        # Crée la table si elle n'existe pas
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS detainees (
+            identifier INTEGER PRIMARY KEY,
+            name TEXT,
+            age INTEGER,
+            crime TEXT,
+            sentence_duration INTEGER,
+            cell INTEGER
+        )
+        """)
+        self.conn.commit()
+
+    def sync_inmates(self):
+        """Copie les inmates de la liste vers la base SQLite"""
+        for inmate in inmates:
+            self.cursor.execute("""
+            INSERT OR REPLACE INTO detainees
+            VALUES (?,?,?)
+            """, (inmate.identifier, inmate.name, inmate.age,
+                  inmate.crime, inmate.sentence_duration, inmate.cell))
+        self.conn.commit()
+
     def show_data_menu(self):
-        self.cursor.execute("""
-            SELECT p.prisoner_id, p.name, p.entry_date, p.sentence_duration, c.cell_number
-            FROM prisoners p
-            LEFT JOIN cells c ON p.cell_id = c.cell_id
-        """)
-        prisoners = self.cursor.fetchall()
+        self.sync_inmates() # on met à jour la base
 
-        self.cursor.execute("""
-            SELECT c.cell_id, c.cell_number, c.capacity, COUNT(p.prisoner_id) as occupied
-            FROM cells c
-            LEFT JOIN prisoners p ON c.cell_id = p.cell_id
-            GROUP BY c.cell_id
-        """)
-        cells = self.cursor.fetchall()
+        print("\n===== DATA VIEW =====")
 
-        print("\n" + "="*60)
-        print(" MENU DATA - DETENUS ACTUELS")
-        print("="*60)
+        self.cursor.execute("SELECT * FROM detainees")
+        detainees = self.cursor.fetchall()
 
-        print("\n--- LISTE DES DETENUS ---")
-        print(f"{'ID':<5} {'Nom':<20} {'Entrée':<12} {'Peine':<6} {'Cellule':<8}")
-        print("-" * 55)
-        if prisoners:
-            for row in prisoners:
-                print(f"{row[0]:<5} {row[1]:<20} {row[2]:<12} {row[3]:<6} {row[4] if row[4] else 'N/A':<8}")
+        if not detainees:
+            print("No detainees registered yet.")
         else:
-            print("Aucun détenu en cours")
+            print("\n--- Detainees ---")
+            for d in detainees:
+                print(f"ID: {d[0]} | Name: {d[1]} | Age: {d[2]} | Crime: {d[3]} | Sentence: {d[4]}y | Cell: {d[5]}")
 
-        print("\n--- LISTE DES CELLULES ---")
-        print(f"{'ID':<5} {'N° Cellule':<12} {'Capacité':<10} {'Occupée':<8}")
-        print("-" * 40)
-        if cells:
-            for row in cells:
-                print(f"{row[0]:<5} {row[1]:<12} {row[2]:<10} {row[3]:<8}")
-        else:
-            print("Aucune cellule")
-
-def menu_data():
+def show_data_menu():
     db = DatabaseData()
-    while True:
-        print("\n" + "="*60)
-        print(" MENU DATA")
-        print("="*60)
-        print("1. Afficher détenus et cellules")
-        print("2. Quitter")
-        choix = input("Votre choix: ")
-
-        if choix == "1":
-            db.show_data_menu()
-            input("\nAppuyez sur Entrée pour revenir...")
-        elif choix == "2":
-            break
-        else:
-            print("Choix invalide")
-    db.conn.close()
-
-if __name__ == "__main__":
-    menu_data()
+    db.show_data_menu()
