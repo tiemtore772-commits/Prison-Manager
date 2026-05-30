@@ -1,273 +1,156 @@
 # cells.py
-# Gestion des cellules — BIT Prison Manager
-
+# Gestion des cellules 
 from detainees import Detenu, detenus
 
+class Cell:
 
-# ──────────────────────────────────────────
-#  CLASSE CELLULE
-# ──────────────────────────────────────────
+    def __init__(self, number, max_capacity):
+        self.number    = number
+        self.capacity  = max_capacity
+        self.detainees = []
 
-class Cellule:
-    """
-    Représente une cellule de la prison.
-    Gère l'affectation et le retrait des détenus.
-    """
+    def is_full(self):
+        return len(self.detainees) >= self.capacity
 
-    def __init__(self, numero: str, capacite_max: int):
-        """
-        Initialise une cellule.
-
-        Args:
-            numero       : Numéro identifiant la cellule (ex: 'A01')
-            capacite_max : Nombre maximum de détenus
-        """
-        self.__numero        = numero
-        self.__capacite_max  = capacite_max
-        self.__liste_detenus = []   # liste des IDs des détenus affectés
-
-    # ── Getters ──────────────────────────
-
-    def get_numero(self) -> str:
-        """Retourne le numéro de la cellule."""
-        return self.__numero
-
-    def get_capacite_max(self) -> int:
-        """Retourne la capacité maximale."""
-        return self.__capacite_max
-
-    def get_liste_detenus(self) -> list:
-        """Retourne la liste des IDs des détenus."""
-        return self.__liste_detenus
-
-    def get_nb_occupants(self) -> int:
-        """Retourne le nombre actuel d'occupants."""
-        return len(self.__liste_detenus)
-
-    # ── Méthodes principales ─────────────
-
-    def est_pleine(self) -> bool:
-        """
-        Vérifie si la cellule a atteint sa capacité maximale.
-
-        Returns:
-            bool : True si pleine, False sinon
-        """
-        return len(self.__liste_detenus) >= self.__capacite_max
-
-    def ajouter_detenu(self, id_detenu: str) -> bool:
-        """
-        Affecte un détenu à la cellule si elle n'est pas pleine.
-
-        Args:
-            id_detenu : ID du détenu à affecter
-
-        Returns:
-            bool : True si ajout réussi, False sinon
-        """
-        if self.est_pleine():
-            print(f"❌ Cellule {self.__numero} pleine.")
+    def add_detainee(self, detainee_id):
+        if self.is_full():
+            print("Cell is full.")
             return False
 
-        if id_detenu in self.__liste_detenus:
-            print(f"❌ Détenu {id_detenu} déjà dans cette cellule.")
+        if detainee_id in self.detainees:
+            print("Detainee already in this cell.")
             return False
-
-        self.__liste_detenus.append(id_detenu)
-        print(f"✅ Détenu {id_detenu} affecté à la cellule {self.__numero}.")
+        self.detainees.append(detainee_id)
+        print("Detainee added to cell " + self.number + ".")
         return True
 
-    def retirer_detenu(self, id_detenu: str) -> bool:
-        """
-        Retire un détenu de la cellule.
-
-        Args:
-            id_detenu : ID du détenu à retirer
-
-        Returns:
-            bool : True si retrait réussi, False sinon
-        """
-        if id_detenu in self.__liste_detenus:
-            self.__liste_detenus.remove(id_detenu)
-            print(f"✅ Détenu {id_detenu} retiré de la cellule {self.__numero}.")
+    def remove_detainee(self, detainee_id):
+        if detainee_id in self.detainees:
+            self.detainees.remove(detainee_id)
+            print("Detainee removed from cell " + self.number + ".")
             return True
 
-        print(f"❌ Détenu {id_detenu} introuvable dans cette cellule.")
+        print("Detainee not found in this cell.")
         return False
 
-    def afficher_occupants(self) -> None:
-        """Affiche les détails de la cellule et ses occupants."""
-        print("\n" + "═" * 40)
-        print(f"   CELLULE {self.__numero}")
-        print("═" * 40)
-        print(f"  Capacité   : {self.get_nb_occupants()} / {self.__capacite_max}")
-        print(f"  Statut     : {'🔴 Pleine' if self.est_pleine() else '🟢 Disponible'}")
-        print("  Occupants  :")
+    def show(self):
+        print("\nCell: " + self.number)
+        print("Capacity: " + str(len(self.detainees)) + "/" + str(self.capacity))
 
-        if not self.__liste_detenus:
-            print("    Aucun détenu affecté.")
+        if self.detainees:
+            for detainee_id in self.detainees:
+                if detainee_id in detenus:
+                    d = detenus[detainee_id]
+                    print("  " + detainee_id + " - " + d.get_prenom() + " " + d.get_nom())
         else:
-            # Boucle for pour afficher chaque occupant
-            for id_det in self.__liste_detenus:
-                if id_det in detenus:
-                    d = detenus[id_det]
-                    print(f"    • [{id_det}] "
-                          f"{d.get_prenom()} {d.get_nom()}")
-                else:
-                    print(f"    • [{id_det}] (introuvable)")
-        print("═" * 40)
+            print("  Empty cell.")
 
-    def to_dict(self) -> dict:
-        """
-        Convertit la cellule en dictionnaire pour la sauvegarde JSON.
-
-        Returns:
-            dict : Données de la cellule
-        """
+    def to_dict(self):
         return {
-            "numero"        : self.__numero,
-            "capacite_max"  : self.__capacite_max,
-            "liste_detenus" : self.__liste_detenus
+            "number"    : self.number,
+            "capacity"  : self.capacity,
+            "detainees" : self.detainees
         }
 
 
-# ──────────────────────────────────────────
-#  STOCKAGE EN MÉMOIRE
-# ──────────────────────────────────────────
-
-# Dictionnaire {numero_cellule : objet Cellule}
-cellules: dict = {}
+cells = {}
 
 
-# ──────────────────────────────────────────
-#  FONCTIONS DE GESTION
-# ──────────────────────────────────────────
+def create_cell():
+    number   = input("Cell number: ").strip().upper()
+    capacity = int(input("Max capacity: "))
 
-def creer_cellule() -> None:
-    """Saisit les informations et crée une nouvelle cellule."""
-    print("\n── CRÉER UNE CELLULE ──")
-    numero      = input("Numéro de cellule (ex: A01) : ").strip().upper()
-    capacite    = int(input("Capacité maximale          : "))
-
-    if numero in cellules:
-        print(f"❌ La cellule {numero} existe déjà.")
+    if number in cells:
+        print("Cell already exists.")
         return
 
-    nouvelle = Cellule(numero, capacite)
-    cellules[numero] = nouvelle
-    print(f"✅ Cellule {numero} créée avec une capacité de {capacite}.")
+    cells[number] = Cell(number, capacity)
+    print("Cell " + number + " created.")
 
 
-def affecter_detenu() -> None:
-    """Affecte un détenu existant à une cellule disponible."""
-    print("\n── AFFECTER UN DÉTENU À UNE CELLULE ──")
-
+def assign_detainee():
     if not detenus:
-        print("❌ Aucun détenu enregistré.")
+        print("No detainees registered.")
         return
 
-    if not cellules:
-        print("❌ Aucune cellule créée.")
+    if not cells:
+        print("No cells created.")
         return
 
-    id_detenu = input("ID du détenu  : ").strip()
-    num_cell  = input("Numéro cellule : ").strip().upper()
+    detainee_id = input("Detainee ID: ").strip()
+    cell_number = input("Cell number: ").strip().upper()
 
-    # Vérifications
-    if id_detenu not in detenus:
-        print("❌ Détenu introuvable.")
+    if detainee_id not in detenus:
+        print("Detainee not found.")
         return
 
-    if num_cell not in cellules:
-        print("❌ Cellule introuvable.")
+    if cell_number not in cells:
+        print("Cell not found.")
         return
 
-    cellule = cellules[num_cell]
-    detenu  = detenus[id_detenu]
-
-    # Affectation
-    succes = cellule.ajouter_detenu(id_detenu)
-
-    if succes:
-        # Mise à jour du côté du détenu aussi
-        detenu.set_cellule(num_cell)
+    ok = cells[cell_number].add_detainee(detainee_id)
+    if ok:
+        detenus[detainee_id].set_cellule(cell_number)
 
 
-def retirer_detenu_cellule() -> None:
-    """Retire un détenu d'une cellule."""
-    print("\n── RETIRER UN DÉTENU D'UNE CELLULE ──")
+def remove_detainee():
+    cell_number = input("Cell number: ").strip().upper()
+    detainee_id = input("Detainee ID: ").strip()
 
-    num_cell  = input("Numéro cellule : ").strip().upper()
-    id_detenu = input("ID du détenu   : ").strip()
-
-    if num_cell not in cellules:
-        print("❌ Cellule introuvable.")
+    if cell_number not in cells:
+        print("Cell not found.")
         return
 
-    cellule = cellules[num_cell]
-    succes  = cellule.retirer_detenu(id_detenu)
-
-    if succes and id_detenu in detenus:
-        detenus[id_detenu].set_cellule("Non assignée")
+    ok = cells[cell_number].remove_detainee(detainee_id)
+    if ok and detainee_id in detenus:
+        detenus[detainee_id].set_cellule("Unassigned")
 
 
-def lister_cellules() -> None:
-    """Affiche l'état de toutes les cellules."""
-    print("\n── LISTE DES CELLULES ──")
-
-    if not cellules:
-        print("Aucune cellule enregistrée.")
+def list_cells():
+    if not cells:
+        print("No cells.")
         return
 
-    for cellule in cellules.values():
-        statut = "🔴 Pleine" if cellule.est_pleine() else "🟢 Disponible"
-        print(f"  Cellule {cellule.get_numero()} "
-              f"— {cellule.get_nb_occupants()}/"
-              f"{cellule.get_capacite_max()} "
-              f"— {statut}")
+    for cell in cells.values():
+        status = "full" if cell.is_full() else "available"
+        print("  " + cell.number + " - " + str(len(cell.detainees)) + "/" + str(cell.capacity) + " - " + status)
 
 
-def voir_cellule() -> None:
-    """Affiche les détails et occupants d'une cellule précise."""
-    print("\n── VOIR UNE CELLULE ──")
-    num_cell = input("Numéro de cellule : ").strip().upper()
+def view_cell():
+    number = input("Cell number: ").strip().upper()
 
-    if num_cell not in cellules:
-        print("❌ Cellule introuvable.")
+    if number not in cells:
+        print("Cell not found.")
         return
 
-    cellules[num_cell].afficher_occupants()
+    cells[number].show()
 
 
-def menu_cellules() -> None:
-    """Affiche le menu de gestion des cellules."""
-    continuer: bool = True
+def cells_menu():
+    running = True
 
-    while continuer:
-        print("\n╔══════════════════════════════════╗")
-        print("║       GESTION DES CELLULES       ║")
-        print("╠══════════════════════════════════╣")
-        print("║  1. Créer une cellule            ║")
-        print("║  2. Affecter un détenu           ║")
-        print("║  3. Retirer un détenu            ║")
-        print("║  4. Lister toutes les cellules   ║")
-        print("║  5. Voir détails d'une cellule   ║")
-        print("║  0. Retour au menu principal     ║")
-        print("╚══════════════════════════════════╝")
+    while running:
+        print("\n--- Cell management ---")
+        print("1. Create a cell")
+        print("2. Assign a detainee")
+        print("3. Remove a detainee")
+        print("4. List all cells")
+        print("5. View a cell")
+        print("0. Back")
 
-        choix = input("Votre choix : ").strip()
+        choice = input("Choice: ").strip()
 
-        if choix == "1":
-            creer_cellule()
-        elif choix == "2":
-            affecter_detenu()
-        elif choix == "3":
-            retirer_detenu_cellule()
-        elif choix == "4":
-            lister_cellules()
-        elif choix == "5":
-            voir_cellule()
-        elif choix == "0":
-            continuer = False
+        if choice == "1":
+            create_cell()
+        elif choice == "2":
+            assign_detainee()
+        elif choice == "3":
+            remove_detainee()
+        elif choice == "4":
+            list_cells()
+        elif choice == "5":
+            view_cell()
+        elif choice == "0":
+            running = False
         else:
-            print("❌ Choix invalide. Réessayez.")
+            print("Invalid choice.")
