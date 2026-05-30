@@ -62,5 +62,5 @@ def menudata():
             print("Choix invalide")
     db.conn.close()
 
-if __name__ == "__menudata__":
+if __name__ == "__main__":
     menudata()
