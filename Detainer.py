@@ -1,10 +1,3 @@
-# ==========================================
-# MODULE: INMATE MANAGEMENT
-# Project: Penitentiary Management
-# Language: Python
-# ==========================================
-
-# ---------- CLASS DETAINERS ----------
 class Detainers:
     def __init__(self, identifier, name, age, crime, sentence_duration, cell):
         self.identifier = identifier
@@ -23,16 +16,12 @@ class Detainers:
         print(f"Sentence duration: {self.sentence_duration} years")
         print(f"Cell: {self.cell}")
 
-
-# ---------- INMATE LIST ----------
 inmates = []
 
-
-# ---------- ADD FUNCTION ----------
 def add_inmate():
     print("\n===== ADD AN INMATE =====")
 
-    identifier = input("Enter inmate ID: ")
+    identifier = int(input("Enter inmate ID: "))
     name = input("Enter inmate name: ")
     age = int(input("Enter inmate age: "))
     crime = input("Enter crime committed: ")
@@ -44,8 +33,6 @@ def add_inmate():
 
     print("\nInmate added successfully!")
 
-
-# ---------- DISPLAY FUNCTION ----------
 def display_inmates():
     print("\n===== INMATE LIST =====")
 
@@ -55,12 +42,10 @@ def display_inmates():
         for inmate in inmates:
             inmate.display_info()
 
-
-# ---------- SEARCH FUNCTION ----------
 def search_inmate():
     print("\n===== SEARCH FOR AN INMATE =====")
 
-    search_id = input("Enter inmate ID: ")
+    search_id = int (input("Enter inmate ID: "))
 
     found = False
 
@@ -73,8 +58,6 @@ def search_inmate():
     if not found:
         print("Inmate not found.")
 
-
-# ---------- EDIT FUNCTION ----------
 def edit_inmate():
     print("\n===== EDIT AN INMATE =====")
 
@@ -95,12 +78,10 @@ def edit_inmate():
 
     print("Inmate not found.")
 
-
-# ---------- DELETE FUNCTION ----------
 def delete_inmate():
     print("\n===== DELETE AN INMATE =====")
 
-    delete_id = input("Enter the ID of the inmate to delete: ")
+    delete_id = int (input("Enter the ID of the inmate to delete: "))
 
     for inmate in inmates:
         if inmate.identifier == delete_id:
@@ -110,19 +91,18 @@ def delete_inmate():
 
     print("Inmate not found.")
 
-
-# ---------- MAIN MENU ----------
-def menu():
+def menu_detaines():
     while True:
-        print("\n====================================")
-        print("  PENITENTIARY MANAGEMENT SYSTEM")
-        print("====================================")
-        print("1. Add an inmate")
-        print("2. Display inmates")
-        print("3. Search for an inmate")
-        print("4. Edit an inmate")
-        print("5. Delete an inmate")
-        print("6. Quit")
+        print("\n                             ")
+        print("        Detainers              ")
+        print("")
+        print("   1. Add an inmate            ")
+        print("   2. Display inmates          ")
+        print("   3. Search for an inmate     ")
+        print("   4. Edit an inmate           ")
+        print("   5. Delete an inmate         ")
+        print("   0. Quit                     ")
+        print("")
 
         choice = input("\nEnter your choice: ")
 
@@ -141,13 +121,12 @@ def menu():
         elif choice == "5":
             delete_inmate()
 
-        elif choice == "6":
+        elif choice == "0":
             print("\nThank you for using the system.")
             break
 
         else:
             print("\nInvalid choice. Please try again.")
 
-
-# ---------- PROGRAM ENTRY POINT ----------
-menu()
+if __name__=="__main__":
+    menu_detaines()
