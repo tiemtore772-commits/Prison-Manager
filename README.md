@@ -1,4 +1,4 @@
-#  BIT Prison Manager
+# Prison Manager
 
 A Python-based prison management system built as a group project for the
 Programming I course at Burkina Institute of Technology (BIT), May 2026.
