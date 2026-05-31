@@ -4,15 +4,23 @@ from datetime import datetime
 def register_bail(data):
     print("\n── REGISTER BAIL ──")
     
-    
+    # Enter inmate ID
+
+ 
     inmate_id = input("Inmate ID: ").strip().upper()
+
+     # Search for the inmate
+
     
     inmate = next((d for d in data["inmates"] if d["id"] == inmate_id), None)
     
 
+# Check if the inmate exists
+
     if not inmate:
         print("Inmate not found.")
         return data
+# Enter amount 
 
     try:
         amount = float(input("Bail amount (FCFA): ").strip())
@@ -20,7 +28,8 @@ def register_bail(data):
         print(" Invalid amount.")
         return data
 
-    
+    # Create financial record 
+
     bail = {
         "inmate_id": inmate_id,
         "inmate_name": f"{inmate['first_name']} {inmate['last_name']}",
@@ -29,7 +38,7 @@ def register_bail(data):
         "date": datetime.now().strftime("%d/%m/%Y %H:%M"),
         "notes": input("Notes (optional): ").strip()
     }
-
+# Add to finance list
     data["finances"].append(bail)
     print(f"Bail of {amount:,.0f} FCFA registered for {bail['inmate_name']}.")
 
@@ -37,6 +46,8 @@ def register_bail(data):
 
 def view_summary(data):
     print("\n--FINANCIAL SUMMARY --")
+ 
+# Check if transactions exist
 
     if not data["finances"]:
         print("No transactions recorded.")
@@ -44,16 +55,20 @@ def view_summary(data):
 
     total = 0
 
+# Sort transactions by type
+
 
     bails = [f for f in data["finances"] if f["type"] == "bail"]
     fines = [f for f in data["finances"] if f["type"] == "fine"]
     fees  = [f for f in data["finances"] if f["type"] == "fees"]
 
+# Display header
     
     print(f"\n  {'TYPE':<12} {'INMATE':<25} {'AMOUNT':>15}  {'DATE'}")
     print("  " + "─" * 65)
 
-    
+    # Display transactions 
+
     for f in data["finances"]:
         total += f["amount"]
 
@@ -64,10 +79,12 @@ def view_summary(data):
             f"{f['date']}"
         )
 
+# Display totale 
     
     print("  " + "─" * 65)
     print(f"  {'TOTAL':>38} {total:>13,.0f} FCFA")
 
+# Summary by category
     
     print(f"\n  Bail  : {sum(x['amount'] for x in bails):>10,.0f} FCFA ({len(bails)} entries)")
     print(f"  Fines : {sum(x['amount'] for x in fines):>10,.0f} FCFA ({len(fines)} entries)")
@@ -77,8 +94,11 @@ def view_summary(data):
 def inmate_summary(data):
     print("\n── SUMMARY BY INMATE ──")
 
+# Enter inmate ID
     
     inmate_id = input("Inmate ID: ").strip().upper()
+
+# Search inmate transactions
 
     transactions = [f for f in data["finances"] if f["inmate_id"] == inmate_id]
 
@@ -87,9 +107,11 @@ def inmate_summary(data):
         print(" No transactions found for this inmate.")
         return
 
+# Calculate total
 
     total = sum(f["amount"] for f in transactions)
 
+# Display transactions
 
     for f in transactions:
         print(
